@@ -415,52 +415,34 @@ class Api {
       'client_secret': DISCORD_CLIENT_SECRET,
       'grant_type': 'authorization_code',
       'code': auth_code,
-      'redirect_uri': 'localhost:/3000',
+      'redirect_uri': 'http://localhost:3000/account',
       'scope': 'identify'
     }
-    var token_headers = {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-    var access_token;
-    // $.post('%s/oauth2/token' % API_ENDPOINT, token_data, function(data, status, jQxhr) {
-    //   access_token = data.get('access_token');
-    // });
+    var discord_access_token;
+    $.post("https://discordapp.com/api/oauth2/token", token_data, function(data, status, jQxhr) {
+      // TODO: Verify we got a token before continuing  
+      // var error = data.error;
+      // if(error !== null){
+      //   console.log("returning " + data);
+      //   callback(null, null);
+      //   return;
+      // }
+      discord_access_token = data.access_token;
 
-    $.ajax({
-      url: 'https://discordapp.com/api/oauth2/token',
-      type: 'POST',
-      contentType: 'application/x-www-form-urlencoded',
-      data: token_data,
-      processData: false,
-    }).done((data, status) => {
-      access_token = data;
+      $.ajax({
+        url: API_ENDPOINT + "/users/@me",
+        type: "GET",
+        beforeSend: function(xhr){xhr.setRequestHeader("Authorization", `Bearer ${discord_access_token}`);},
+        success: function(data, status){
+          console.log(data);
+
+          var discord_username = data.username + "#" + data.discriminator;
+          var snowflake = data.id;
+
+          callback(discord_username, snowflake);
+        }
+      });
     });
-
-    console.log(access_token);
-
-    // Handle getting user data
-
-    var user_data_headers = {
-      Authorization: `Bearer ${access_token}`
-    }
-    var user_json;
-    var user_id;
-    var user_username;
-    var user_discriminator;
-    $.get(API_ENDPOINT+"/users/@me", user_data_headers).done((data, status) => {
-      console.log(data);
-      user_id = data.get('id');
-      user_username = data.get('username');
-      user_discriminator = data.get('discriminator');
-    });
-
-    // var user_id = user_json.get('id');
-    // var user_username = user_json.get('username');
-    // var user_discriminator = user_json.get('discriminator');
-
-    console.log(user_id);
-    console.log(user_username);
-    console.log(user_discriminator);
 
   }
 
