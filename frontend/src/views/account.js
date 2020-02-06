@@ -20,8 +20,11 @@ class Account extends Component {
                 country: '',
                 is_staff: '',
                 id: '',
-                verified: ''
+                verified: '',
+                discord_username: '',
+                discord_snowflake_id: ''
             },
+            'discordButton': "Connect Discord",
             'up': 'Update Info',
             'selectedFile': null
         };
@@ -29,6 +32,9 @@ class Account extends Component {
         this.changeHandler = this.changeHandler.bind(this);
         this.updateUser = this.updateUser.bind(this);
         this.uploadProfile = this.uploadProfile.bind(this);
+        this.connectDiscord = this.connectDiscord.bind(this);
+        this.checkDiscordConnection = this.checkDiscordConnection.bind(this);
+
     }
 
     changeHandler(e) {
@@ -38,6 +44,23 @@ class Account extends Component {
             prevState.user[id] = val;
             return prevState;
         });
+    }
+
+    connectDiscord(e) {
+        // TODO: Add State verification
+        window.location.replace("https://discordapp.com/api/oauth2/authorize?client_id=674781988288200707&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Faccount&response_type=code&scope=identify");
+    }
+
+    checkDiscordConnection(e) {
+        const current_url = new URLSearchParams(window.location.search);
+        const discord_oauth_code = current_url.get("code");
+
+        console.log(current_url);
+        console.log(discord_oauth_code);
+
+        if(discord_oauth_code !== null){
+            Api.connectDiscord(discord_oauth_code, null);
+        }
     }
 
     fileChangeHandler = event => {
@@ -80,13 +103,13 @@ class Account extends Component {
     }
 
     render() {
-        let btn_class = "btn btn" 
-        let file_label = "No file chosen."
-        let button = <button disabled style={{float: "right"}} onClick={this.uploadResume} className={ btn_class }> Upload </button>
+        let resume_btn_class = "btn btn" 
+        let resume_file_label = "No file chosen."
+        let resume_button = <button disabled style={{float: "right"}} onClick={this.uploadResume} className={ resume_btn_class }> Upload </button>
         if (this.state.selectedFile !== null) {
-            btn_class += " btn-info btn-fill" 
-            file_label = this.state.selectedFile["name"]
-            button = <button style={{float: "right"}} onClick={this.uploadResume} className={ btn_class }> Upload </button>
+            resume_btn_class += " btn-info btn-fill" 
+            resume_file_label = this.state.selectedFile["name"]
+            resume_button = <button style={{float: "right"}} onClick={this.uploadResume} className={ resume_btn_class }> Upload </button>
         }
 
         let resume_status = null
@@ -99,6 +122,24 @@ class Account extends Component {
             resume_status = (
                 <label style={{float: "right", color: "green"}}>
                     <i className="pe-7s-check pe-fw" style={{fontWeight: 'bold'}}/>Uploaded!
+                </label>
+            )
+        }
+
+        this.checkDiscordConnection()
+
+        let discord_btn_class = "btn btn"
+        let discord_connection_label = this.state.discord_username
+        let discord_button = <button style={{float: "right"}} onClick={this.connectDiscord} className="btn btn-info btn-fill pull-left"> Connect Discord </button>
+        let discord_status = null
+        if (this.state.discord_username !== null){
+            discord_status = (
+                <label style={{float: "right", color: "green"}}> {this.state.discord_username}
+                </label>
+            )
+        } else {
+            discord_status = (
+                <label style={{float: "right"}}> Not Connected
                 </label>
             )
         }
@@ -384,14 +425,28 @@ class Account extends Component {
                                                     {resume_status}
                                                     <br />
                                                     <label htmlFor="file_upload">
-                                                        <div className="btn"> Choose File </div> <span style={ { textTransform: 'none', marginLeft: '10px', fontSize: '14px'} }> {file_label} </span>
+                                                        <div className="btn"> Choose File </div> <span style={ { textTransform: 'none', marginLeft: '10px', fontSize: '14px'} }> {resume_file_label} </span>
                                                     </label>
                                                     <input id="file_upload" type="file" accept=".pdf" onChange={this.fileChangeHandler} style={{display: "none"}}/>
-                                                    {button}
+                                                    {resume_button}
                                                 </div>
                                             </div>
                                         </div>
-                                        <button type="button" onClick={this.updateUser} className="btn btn-info btn-fill pull-right" dangerouslySetInnerHTML={{ __html: this.state.up }}></button>
+                                        <div className="row">
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <label>Connect Discord</label>
+                                                    {discord_status}
+                                                    <br />
+                                                    {discord_button}
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group">
+                                                    <button type="button" onClick={this.updateUser} className="btn btn-info btn-fill pull-right" dangerouslySetInnerHTML={{ __html: this.state.up }}></button>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div className="clearfix" />
                                     </div>
                                 </div>
