@@ -55,11 +55,17 @@ class Account extends Component {
         const current_url = new URLSearchParams(window.location.search);
         const discord_oauth_code = current_url.get("code");
 
-        console.log(current_url);
-        console.log(discord_oauth_code);
-
         if(discord_oauth_code !== null){
-            Api.connectDiscord(discord_oauth_code, null);
+            Api.connectDiscord(discord_oauth_code, function(discord_name, discord_snowflake){
+                if(discord_snowflake !== null){
+                    this.setState(function (prevState, props) {
+                        prevState.user.discord_username = discord_name;
+                        prevState.user.discord_snowflake_id = discord_snowflake;
+                        // return prevState;
+                    })
+                    this.updateUser();
+                }
+            }.bind(this));
         }
     }
 
