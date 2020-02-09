@@ -388,7 +388,6 @@ class Api {
       callback(true);
     }).fail((xhr, status, error) => {
       callback(false);
-      console.log(error);
     });
   }
 
@@ -405,13 +404,13 @@ class Api {
   }
 
   static connectDiscord(auth_code, callback) {
+    // TODO: Move these to more safe locations
     const DISCORD_CLIENT_ID = '674781988288200707';
     const DISCORD_CLIENT_SECRET = 'bHD-Ymz2T9X22X6hM9y5iLOSB_WPNRQS';
     const API_ENDPOINT = 'https://discordapp.com/api/v6';
 
     // Handle Getting Access Token
     var token_data = {
-      // TODO: Move these to more safe locations
       'client_id': DISCORD_CLIENT_ID,
       'client_secret': DISCORD_CLIENT_SECRET,
       'grant_type': 'authorization_code',
@@ -421,13 +420,6 @@ class Api {
     }
     var discord_access_token;
     $.post("https://discordapp.com/api/oauth2/token", token_data, function(data, status, jQxhr) {
-      // TODO: Verify we got a token before continuing  
-      // var error = data.error;
-      // if(error !== null){
-      //   console.log("returning " + data);
-      //   callback(null, null);
-      //   return;
-      // }
       discord_access_token = data.access_token;
 
       $.ajax({

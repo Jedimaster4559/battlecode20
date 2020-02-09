@@ -149,7 +149,8 @@ class Account extends Component {
         if (this.state.user.discord_username !== ''){
             discord_status = (
                 <label style={{float: "right", color: "green"}}> {this.state.discord_username}
-                    <i className="pe-7s-check pe-fw" style={{fontWeight: 'bold'}}/>Connected!
+                    <i className="pe-7s-check pe-fw" style={{fontWeight: 'bold'}}/>Connected!<br/>
+                    {this.state.discord_username}
                 </label>
             )
         } else {
