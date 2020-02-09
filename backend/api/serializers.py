@@ -74,7 +74,7 @@ class FullUserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('id', 'url', 'email', 'first_name', 'last_name', 'password', 'date_of_birth',
-            'username', 'avatar', 'bio', 'country', 'is_staff', 'verified')
+            'username', 'avatar', 'bio', 'country', 'is_staff', 'verified', 'discord_username', 'discord_snowflake')
         read_only_fields = ('id', 'url', 'registration_key', 'is_staff', 'verified')
         extra_kwargs = {
             'password': {'write_only': True}
@@ -101,6 +101,8 @@ class FullUserSerializer(serializers.HyperlinkedModelSerializer):
         instance.bio = validated_data.get('bio', instance.bio)
         instance.country = validated_data.get('country', instance.country)
         instance.avatar = validated_data.get('avatar', instance.avatar)
+        instance.discord_username = validated_data.get('discord_username', instance.discord_username)
+        instance.discord_snowflake = validated_data.get('discord_snowflake', instance.discord_snowflake)
         instance.save()
         return instance
 

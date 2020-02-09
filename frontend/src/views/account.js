@@ -22,7 +22,7 @@ class Account extends Component {
                 id: '',
                 verified: '',
                 discord_username: '',
-                discord_snowflake_id: ''
+                discord_snowflake: ''
             },
             'discordButton': "Connect Discord",
             'up': 'Update Info',
@@ -46,6 +46,13 @@ class Account extends Component {
         });
     }
 
+    changeHandler(id, value) {
+        this.setState(function (prevState, props) {
+            prevState.user[id] = value;
+            return prevState;
+        });
+    }
+
     connectDiscord(e) {
         // TODO: Add State verification
         window.location.replace("https://discordapp.com/api/oauth2/authorize?client_id=674781988288200707&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Faccount&response_type=code&scope=identify");
@@ -56,13 +63,15 @@ class Account extends Component {
         const discord_oauth_code = current_url.get("code");
 
         if(discord_oauth_code !== null){
-            Api.connectDiscord(discord_oauth_code, function(discord_name, discord_snowflake){
-                if(discord_snowflake !== null){
-                    this.setState(function (prevState, props) {
-                        prevState.user.discord_username = discord_name;
-                        prevState.user.discord_snowflake_id = discord_snowflake;
-                        // return prevState;
-                    })
+            Api.connectDiscord(discord_oauth_code, function(discord_name, discord_snowflake_id){
+                if(discord_snowflake_id !== null){
+                    
+                    this.state.user.discord_username = discord_name;
+                    this.state.user.discord_snowflake = discord_snowflake_id;
+                    // return prevState;
+                    this.changeHandler("discord_username", discord_name);
+                    this.changeHandler("discord_snowflake", discord_snowflake_id);
+
                     this.updateUser();
                 }
             }.bind(this));
@@ -101,6 +110,7 @@ class Account extends Component {
         Api.getUserProfile(function (u) {
             console.log(u);
             this.setState({ user: u });
+            this.checkDiscordConnection();
         }.bind(this));
     }
 
@@ -132,15 +142,14 @@ class Account extends Component {
             )
         }
 
-        this.checkDiscordConnection()
-
         let discord_btn_class = "btn btn"
         let discord_connection_label = this.state.discord_username
         let discord_button = <button style={{float: "right"}} onClick={this.connectDiscord} className="btn btn-info btn-fill pull-left"> Connect Discord </button>
         let discord_status = null
-        if (this.state.discord_username !== null){
+        if (this.state.user.discord_username !== ''){
             discord_status = (
                 <label style={{float: "right", color: "green"}}> {this.state.discord_username}
+                    <i className="pe-7s-check pe-fw" style={{fontWeight: 'bold'}}/>Connected!
                 </label>
             )
         } else {

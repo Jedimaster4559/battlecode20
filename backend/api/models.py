@@ -58,6 +58,9 @@ class User(AbstractUser):
     registration_key = models.CharField(max_length=32, null=True, unique=True)
     verified         = models.BooleanField(default=False)
 
+    discord_username = models.CharField(max_length=37, blank=True)
+    discord_snowflake= models.BigIntegerField(default=0)
+
     bio      = models.CharField(max_length=1000, blank=True)
     avatar   = models.TextField(blank=True)
     country  = models.TextField(blank=True)

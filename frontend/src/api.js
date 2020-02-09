@@ -388,6 +388,7 @@ class Api {
       callback(true);
     }).fail((xhr, status, error) => {
       callback(false);
+      console.log(error);
     });
   }
 
@@ -434,8 +435,6 @@ class Api {
         type: "GET",
         beforeSend: function(xhr){xhr.setRequestHeader("Authorization", `Bearer ${discord_access_token}`);},
         success: function(data, status){
-          console.log(data);
-
           var discord_username = data.username + "#" + data.discriminator;
           var snowflake = data.id;
 
